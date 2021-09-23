@@ -41,7 +41,7 @@ const UsuarioSchema = new mongoose.Schema({
         type: String,
         unique: true,
         required: [true, 'Falta email'],
-        match: [/\S+@\S+\.\S+/, "Email inválido"],
+        match: [/\S+@\S+.\S+/, "Email inválido"],
         index: true
     },
     tipo: {
@@ -60,10 +60,10 @@ UsuarioSchema.methods.crearPassword = function (password) {
 
 UsuarioSchema.methods.validarPassword = function (password) {
     const newHash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
-    return this.hash === hash
+    return this.hash === newHash
 }
 
-UsuarioSchema.methods.generaJWT = function () {
+UsuarioSchema.methods.generaJWT = function() {
     const today = new Date();
     const exp = new Date(today);
     exp.setDate(today.getDate() + 60);
@@ -74,7 +74,7 @@ UsuarioSchema.methods.generaJWT = function () {
     }, secret)
 }
 
-UsuarioSchema.methods.toAuthJSON = function () {
+UsuarioSchema.methods.toAuthJSON = function() {
     return {
         username: this.username,
         email: this.email,
