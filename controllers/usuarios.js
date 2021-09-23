@@ -74,15 +74,21 @@ function eliminarUsuario(req, res, next) {
 }
 
 function iniciarSesion(req, res, next) {
-    if (!req.body.email || !req.body.password) {
+    if (!req.body.email) {
         return res.status(422).json({ error: { email: 'Falta información' } })
     }
+
+    if (!req.body.password) {
+        return res.status(422).json({ error: { password: "No puede estar vacío" } })
+    }
+
     passport.authenticate('local',
         { session: false },
         function (err, user, info) {
             if (err) { return next(err) }
             if (user) {
                 user.token = user.generaJWT()
+                return res.json({ user: user.toAuthJSON() })
             }
             else {
                 return res.status(422).json(info)
